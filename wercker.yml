@@ -59,8 +59,13 @@ build:
       code: |
         if [[ $SKIP_CI == 'false' ]]; then
           cd sevntu-checks
-          echo "Command: mvn clean verify"
-          mvn clean verify
+          mkdir -p .ci-temp
+          cd .ci-temp
+          git clone -b issue-10100 https://github.com/nmancus1/checkstyle.git
+          cd checkstyle
+          mvn -e clean install -Pno-validations
+          cd ../..
+          mvn clean verify -Dcheckstyle.eclipse-cs.version=8.44-SNAPSHOT
           cd ..
         else
           echo "build is skipped ..."
