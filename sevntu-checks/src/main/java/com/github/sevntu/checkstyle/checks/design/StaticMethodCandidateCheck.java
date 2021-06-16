@@ -33,6 +33,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * Checks whether {@code private} methods can be declared as {@code static}.
@@ -527,10 +528,13 @@ public class StaticMethodCandidateCheck extends AbstractCheck {
      * @return true, if LITERAL_THIS is used or the usage is too complex to check.
      */
     private static boolean isIdentShouldBeChecked(DetailAST parentAst) {
-        final int parentAstType = parentAst.getType();
-        return parentAstType != TokenTypes.LITERAL_NEW
-                && parentAstType != TokenTypes.TYPE
-                && parentAstType != TokenTypes.METHOD_DEF;
+        final int[] parentTypesNotToBeChecked = {
+            TokenTypes.LITERAL_NEW,
+            TokenTypes.TYPE,
+            TokenTypes.METHOD_DEF,
+            TokenTypes.TYPE_ARGUMENT,
+        };
+        return !TokenUtil.isOfType(parentAst, parentTypesNotToBeChecked);
     }
 
     /**
